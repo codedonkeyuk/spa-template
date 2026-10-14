@@ -1,5 +1,4 @@
 import { defineConfig } from "vite";
-import { createHtmlPlugin } from "vite-plugin-html";
 import siteConfig from "./site-config.json" with { type: "json" };
 import { VitePWA } from "vite-plugin-pwa";
 
@@ -27,22 +26,15 @@ export default defineConfig({
         config: true,
       },
     }),
-    createHtmlPlugin({
-      minify: true,
-      pages: [
-        {
-          filename: "index.html",
-          template: "index.html",
-          injectOptions: {
-            data: {
-              title: siteConfig.appName,
-              metaDescription: siteConfig.metaDescription,
-              publicSiteAddress: siteConfig.publicSiteAddress,
-            },
-          },
-        },
-      ],
-    }),
+    {
+      name: "native-html-transform",
+      transformIndexHtml(html) {
+        return html
+          .replace(/<%- title %>/g, siteConfig.appName)
+          .replace(/<%- metaDescription %>/g, siteConfig.metaDescription)
+          .replace(/<%- publicSiteAddress %>/g, siteConfig.publicSiteAddress);
+      },
+    },
   ],
   test: {
     globals: true,
